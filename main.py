@@ -1,69 +1,54 @@
 import pygame
+import os
+import sys
+from background import Background
+from man import AnimatedSprite
+
+pygame.init()
+size = width, height = 1000, 720
+screen = pygame.display.set_mode(size)
 
 
-class Board:
-    def __init__(self, width, height):
-        self.width = width
-        self.height = height
-        self.board = [width * [0] for _ in range(height)]
-
-        self.left = 10
-        self.top = 10
-        self.cell_size = 30
-
-    def set_view(self, left, top, cell_size):
-        self.left = left
-        self.top = top
-        self.cell_size = cell_size
-
-    def render(self, screen):
-        for i in range(len(self.board)):
-            for j in range(len(self.board[i])):
-                value = self.board[i][j]
-
-                color = [(255, 255, 255), (255, 0, 0), (0, 0, 255)][value]
-                w = [1, 0, 0][value]
-
-                pygame.draw.rect(screen, color, (
-                    self.left + self.cell_size * j, self.top + self.cell_size * i, self.cell_size, self.cell_size), w)
-
-    def get_cell(self, mouse_pos):
-        x, y = mouse_pos[0] - self.left, mouse_pos[1] - self.top
-        if x in range(self.width * self.cell_size) and y in range(self.height * self.cell_size):
-            return mouse_pos
-        return None
-
-    def on_click(self, cell):
-        if cell:
-            num_w, num_h = (cell[0] - self.left) // self.cell_size, (cell[1] - self.top) // self.cell_size
-            if self.board[num_h][num_w] == 2:
-                self.board[num_h][num_w] = 0
-            else:
-                self.board[num_h][num_w] += 1
-
-    def get_click(self, mouse_pos):
-        cell = self.get_cell(mouse_pos)
-        self.on_click(cell)
+def load_image(name, colorkey=None):
+    fullname = os.path.join('data', name)
+    if not os.path.isfile(fullname):
+        print(f"Файл с изображением '{fullname}' не найден")
+        sys.exit()
+    image = pygame.image.load(fullname)
+    if colorkey == 1:
+        image = image.convert()
+        colorkey = image.get_at((0, 0))
+        image.set_colorkey(colorkey)
+    elif colorkey == 0:
+        image = image.convert_alpha()
+    return image
 
 
 if __name__ == '__main__':
-
-    pygame.init()
-    pygame.display.set_caption('Клеточки')
-    width, height = 400, 500
-    screen = pygame.display.set_mode((width, height))
     clock = pygame.time.Clock()
-    fps = 1
-
-    board = Board(5, 7)
-    board.set_view(50, 50, 50)
+    fps = 60
     running = True
+
+    bgs = pygame.sprite.Group()
+    Background(bgs)
+
+    men = pygame.sprite.Group()
+    dragon = AnimatedSprite(men, load_image("amogus.png", 1), 4, 1, 425, 500)
+    a = 0
+
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                board.get_click(event.pos)
-        screen.fill((0, 0, 0))
-        board.render(screen)
+
+        screen.fill((255, 255, 255))
+        bgs.draw(screen)
+        bgs.update()
+        men.draw(screen)
+        a += 1
+        if a == 3:
+            men.update()
+            a = 0
+
+        clock.tick(fps)
         pygame.display.flip()
