@@ -33,11 +33,13 @@ class AnimatedMan(pygame.sprite.Sprite):
             self.a = 0
 
         if args:
-            if args[0].type == pygame.KEYDOWN and pygame.key.get_pressed()[pygame.K_RIGHT]:
-                if self.rect.x <= 720:
+            if args[0].type == pygame.KEYDOWN and pygame.key.get_pressed()[pygame.K_RIGHT] or \
+                    pygame.key.get_pressed()[pygame.K_d]:
+                if self.rect.x <= 713:
                     self.rect = self.rect.move(10, 0)
-            elif args[0].type == pygame.KEYDOWN and pygame.key.get_pressed()[pygame.K_LEFT]:
+            elif args[0].type == pygame.KEYDOWN and pygame.key.get_pressed()[pygame.K_LEFT] or \
+                    pygame.key.get_pressed()[pygame.K_a]:
                 if self.rect.x >= 170:
                     self.rect = self.rect.move(-10, 0)
             if args[0].type == pygame.KEYDOWN and pygame.key.get_pressed()[pygame.K_UP]:
-                print('dfvgb')
+                pass

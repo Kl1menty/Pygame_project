@@ -23,9 +23,9 @@ class Background(pygame.sprite.Sprite):
     def __init__(self, group):
         super().__init__(group)
         self.rect = self.image.get_rect()
-        self.rect.y = -180
+        self.rect.y = -720
 
     def update(self):
         if self.rect.y >= 0:
-            self.rect.y = -180
+            self.rect.y = -720
         self.rect = self.rect.move(0, 7)

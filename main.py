@@ -10,9 +10,12 @@ from let import Let
 from bullet import Bullet
 
 pygame.init()
-size = width, height = 1000, 720
-screen = pygame.display.set_mode(size)
+width, height = 1000, 720
+screen = pygame.display.set_mode((width, height))
 new_color = None
+st_sc = True
+transparency = 255
+k = 5
 
 
 def load_image(name, colorkey=None):
@@ -28,6 +31,7 @@ def load_image(name, colorkey=None):
     new_color = choice(
         [(3, 169, 244), (192, 23, 0), (50, 50, 255), (232, 82, 190), (235, 128, 0), (50, 239, 1), (20, 20, 20),
          (255, 255, 0)])
+    new_color = (255, 0, 0)
     pixels.replace(old_color, new_color)
     del pixels
 
@@ -43,13 +47,33 @@ def load_image(name, colorkey=None):
 def check_coords(r1, r2, x, y):
     k = 0
     for i in range(len(x)):
-        if min([r2, y[i]]) + 250 > max([r2, y[i]]):
+        if min([r2, y[i]]) + 270 > max([r2, y[i]]):
             if max([r1, x[i]]) > min([r1, x[i]]) + 270:
                 k += 1
         else:
             k += 1
     if k == len(x):
         return True
+
+
+def start_screen():
+    global transparency, k
+    image = pygame.image.load('data/screensaver.jpg')
+    screen.blit(image, (0, 0))
+
+    intro_text = "нажмите  чтобы начать"
+    font = pygame.font.Font(None, 28)
+    string_rendered = font.render(intro_text, 1, (255, 255, 255))
+    string_rendered.set_alpha(transparency)
+    intro_rect = string_rendered.get_rect()
+    intro_rect.x = 37
+    intro_rect.y = 670
+    screen.blit(string_rendered, intro_rect)
+    if transparency == 255:
+        k = -5
+    elif transparency == 0:
+        k = 5
+    transparency += k
 
 
 if __name__ == '__main__':
@@ -79,6 +103,17 @@ if __name__ == '__main__':
     bullets = pygame.sprite.Group()
 
     while running:
+        if st_sc:
+            start_screen()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                elif event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
+                    st_sc = False
+            clock.tick(fps)
+            pygame.display.flip()
+            continue
+
         man_x, bul_y = amogus_run.get_coords()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
