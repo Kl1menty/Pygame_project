@@ -14,8 +14,11 @@ width, height = 1000, 720
 screen = pygame.display.set_mode((width, height))
 new_color = None
 st_sc = True
+ov_sc = False
 transparency = 255
 k = 5
+pygame.mixer.init()
+play_music = False
 
 
 def load_image(name, colorkey=None):
@@ -76,6 +79,11 @@ def start_screen():
     transparency += k
 
 
+def over_screen():
+    image = pygame.image.load('data/game_over.png')
+    screen.blit(image, (0, 0))
+
+
 if __name__ == '__main__':
     clock = pygame.time.Clock()
     fps = 60
@@ -105,48 +113,96 @@ if __name__ == '__main__':
     while running:
         if st_sc:
             start_screen()
+            if not play_music:
+                pygame.mixer.music.load('data/game_start_or_fale.mp3')
+                pygame.mixer.music.play()
+                play_music = True
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
                 elif event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
                     st_sc = False
+                    pygame.mixer.music.stop()
+                    play_music = False
             clock.tick(fps)
             pygame.display.flip()
-            continue
 
-        man_x, bul_y = amogus_run.get_coords()
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                bullet = Bullet(bullets, man_x, bul_y, new_color)
+        elif ov_sc:
+            over_screen()
+            if not play_music:
+                pygame.mixer.music.load('data/game_start_or_fale.mp3')
+                pygame.mixer.music.play()
+                play_music = True
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                elif event.type == pygame.MOUSEBUTTONDOWN and pygame.Rect(653, 213, 160, 160).collidepoint(event.pos):
+                    running = False
+                elif event.type == pygame.MOUSEBUTTONDOWN and pygame.Rect(227, 227, 135, 133).collidepoint(event.pos) \
+                        or event.type == pygame.KEYDOWN:
+                    ov_sc = False
+                    pygame.mixer.music.stop()
+                    play_music = False
+                    lets = pygame.sprite.Group()
+                    x, y = [], []
+                    for i in range(100):
+                        r1, r2 = randint(180, 670), randint(122, 5000)
+                        if check_coords(r1, r2, x, y):
+                            x.append(r1)
+                            y.append(r2)
+                    for i1 in range(len(x)):
+                        Let(lets, x[i1], y[i1])
+                    men_run = pygame.sprite.Group()
+                    amogus_run = AnimatedMan(men_run, load_image('amogus_run.png', 1), 4, 1, 425, 560)
+                    enemies = pygame.sprite.Group()
+                    enemy = AnimatedEnemy(enemies, 6, 1, 0, -130)
+                    bullets = pygame.sprite.Group()
 
-        if len(lets) < 5:
-            x, y = x[-3:-1], y[-3:-1]
-            for i in range(100):
-                r1, r2 = randint(180, 670), randint(130, 5000)
-                if check_coords(r1, r2, x, y):
-                    x.append(r1)
-                    y.append(r2)
-            for i in range(3, len(x)):
-                Let(lets, x[i], y[i])
-            enemy = AnimatedEnemy(enemies, 6, 1, man_x, -130)
+            clock.tick(fps)
+            pygame.display.flip()
 
-        screen.fill((255, 255, 255))
-        bgs.draw(screen)
-        bgs.update()
+        else:
+            man_x, bul_y = amogus_run.get_coords()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                    pygame.mixer.music.load('data/piu.mp3')
+                    pygame.mixer.music.play()
+                    bullet = Bullet(bullets, man_x, bul_y, new_color)
 
-        lets.draw(screen)
-        lets.update(amogus_run, lets)
+            if len(lets) == 5:
+                for _ in range(len(x) - 5):
+                    del x[0]
+                    del y[0]
+                for i in range(50):
+                    r1, r2 = randint(180, 670), randint(130, 5000)
+                    if check_coords(r1, r2, x, y):
+                        x.append(r1)
+                        y.append(r2)
+                        Let(lets, r1, r2)
 
-        men_run.draw(screen)
-        men_run.update(event)
+                enemy = AnimatedEnemy(enemies, 6, 1, man_x, -130)
 
-        enemies.draw(screen)
-        enemies.update(man_x, bullets, enemies, amogus_run)
+            screen.fill((255, 255, 255))
+            bgs.draw(screen)
+            bgs.update()
 
-        bullets.draw(screen)
-        bullets.update(bullets)
+            lets.draw(screen)
+            lets.update(lets)
 
-        clock.tick(fps)
-        pygame.display.flip()
+            men_run.draw(screen)
+            men_run.update(event)
+            if amogus_run.collide(lets):
+                ov_sc = True
+
+            enemies.draw(screen)
+            enemies.update(man_x, bullets, enemies, amogus_run)
+            if enemy.collide():
+                ov_sc = True
+
+            bullets.draw(screen)
+            bullets.update(bullets)
+
+            clock.tick(fps)
+            pygame.display.flip()

@@ -41,6 +41,11 @@ class AnimatedEnemy(pygame.sprite.Sprite):
                 self.frames.append(image.subsurface(pygame.Rect(
                     frame_location, self.rect.size)))
 
+    def collide(self):
+        if self.rect.y == 440:
+            return True
+        return False
+
     def update(self, x, bullets, enemies, amogus_run):
         self.a += 1
         if self.a == 5:
@@ -51,5 +56,5 @@ class AnimatedEnemy(pygame.sprite.Sprite):
         self.rect.x = x
         if pygame.sprite.spritecollideany(self, bullets):
             enemies.remove(self)
-        if self.rect.y == 560-120:
-            sys.exit()
+            pygame.mixer.music.load('data/shredder.mp3')
+            pygame.mixer.music.play()

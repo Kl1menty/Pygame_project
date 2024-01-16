@@ -1,3 +1,4 @@
+import sys
 import pygame
 
 
@@ -24,6 +25,12 @@ class AnimatedMan(pygame.sprite.Sprite):
 
     def get_coords(self):
         return self.rect.x, self.rect.y
+
+    def collide(self, lets):
+        for i in lets:
+            if pygame.sprite.collide_mask(self, i):
+                return True
+        return False
 
     def update(self, *args):
         self.a += 1

@@ -27,9 +27,7 @@ class Let(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = - y
 
-    def update(self, amogus_run, lets):
-        if pygame.sprite.collide_mask(self, amogus_run):
-            sys.exit()
+    def update(self, lets):
         self.rect = self.rect.move(0, 7)
         if self.rect.y > 720:
             lets.remove(self)
