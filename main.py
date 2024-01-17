@@ -2,6 +2,7 @@ import pygame
 import os
 import sys
 from random import choice, randint
+import _datetime as dt
 
 from man import AnimatedMan
 from enemy import AnimatedEnemy
@@ -19,6 +20,9 @@ transparency = 255
 k = 5
 pygame.mixer.init()
 play_music = False
+time_start = time_end = None
+result = '00:00'
+enemy = None
 
 
 def load_image(name, colorkey=None):
@@ -83,6 +87,14 @@ def over_screen():
     image = pygame.image.load('data/game_over.png')
     screen.blit(image, (0, 0))
 
+    text = f"Лучший результат: {best_result}"
+    font = pygame.font.Font(None, 28)
+    string_rendered = font.render(text, 1, (0, 0, 0))
+    intro_rect = string_rendered.get_rect()
+    intro_rect.x = 370
+    intro_rect.y = 175
+    screen.blit(string_rendered, intro_rect)
+
 
 if __name__ == '__main__':
     clock = pygame.time.Clock()
@@ -106,11 +118,16 @@ if __name__ == '__main__':
     amogus_run = AnimatedMan(men_run, load_image('amogus_run.png', 1), 4, 1, 425, 560)
 
     enemies = pygame.sprite.Group()
-    enemy = AnimatedEnemy(enemies, 6, 1, 0, -130)
 
     bullets = pygame.sprite.Group()
 
     while running:
+        with open('data/best_result.txt', 'r') as br:
+            best_result = br.readline()
+            if result > best_result:
+                f = open("data/best_result.txt", 'w')
+                f.write(result)
+                f.close()
         if st_sc:
             start_screen()
             if not play_music:
@@ -124,6 +141,7 @@ if __name__ == '__main__':
                     st_sc = False
                     pygame.mixer.music.stop()
                     play_music = False
+                    time_start = dt.datetime.now()
             clock.tick(fps)
             pygame.display.flip()
 
@@ -140,6 +158,7 @@ if __name__ == '__main__':
                     running = False
                 elif event.type == pygame.MOUSEBUTTONDOWN and pygame.Rect(227, 227, 135, 133).collidepoint(event.pos) \
                         or event.type == pygame.KEYDOWN:
+                    time_start = dt.datetime.now()
                     ov_sc = False
                     pygame.mixer.music.stop()
                     play_music = False
@@ -155,7 +174,6 @@ if __name__ == '__main__':
                     men_run = pygame.sprite.Group()
                     amogus_run = AnimatedMan(men_run, load_image('amogus_run.png', 1), 4, 1, 425, 560)
                     enemies = pygame.sprite.Group()
-                    enemy = AnimatedEnemy(enemies, 6, 1, 0, -130)
                     bullets = pygame.sprite.Group()
 
             clock.tick(fps)
@@ -188,6 +206,14 @@ if __name__ == '__main__':
             bgs.draw(screen)
             bgs.update()
 
+            text = str(dt.datetime.now() - time_start)[2:9]
+            font = pygame.font.Font(None, 36)
+            string_rendered = font.render(text, 1, (255, 0, 0))
+            intro_rect = string_rendered.get_rect()
+            intro_rect.x = 860
+            intro_rect.y = 40
+            screen.blit(string_rendered, intro_rect)
+
             lets.draw(screen)
             lets.update(lets)
 
@@ -195,11 +221,17 @@ if __name__ == '__main__':
             men_run.update(event)
             if amogus_run.collide(lets):
                 ov_sc = True
+                time_end = dt.datetime.now()
+                result = str(time_end - time_start)
+                result = result[2:9]
 
             enemies.draw(screen)
             enemies.update(man_x, bullets, enemies, amogus_run)
-            if enemy.collide():
+            if enemy and enemy.collide():
                 ov_sc = True
+                time_end = dt.datetime.now()
+                result = str(time_end - time_start)
+                result = result[2:9]
 
             bullets.draw(screen)
             bullets.update(bullets)
