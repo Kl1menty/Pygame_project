@@ -206,6 +206,8 @@ if __name__ == '__main__':
             bgs.draw(screen)
             bgs.update()
 
+            pygame.draw.rect(screen, (255, 255, 255), (850, 33, 107, 38), 0, 10)
+
             text = str(dt.datetime.now() - time_start)[2:9]
             font = pygame.font.Font(None, 36)
             string_rendered = font.render(text, 1, (255, 0, 0))
