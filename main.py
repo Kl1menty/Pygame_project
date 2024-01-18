@@ -2,7 +2,7 @@ import pygame
 import os
 import sys
 from random import choice, randint
-import _datetime as dt
+import datetime as dt
 
 from man import AnimatedMan
 from enemy import AnimatedEnemy
@@ -35,10 +35,15 @@ def load_image(name, colorkey=None):
 
     pixels = pygame.PixelArray(image)
     old_color = (3, 169, 244)
-    new_color = choice(
-        [(3, 169, 244), (192, 23, 0), (50, 50, 255), (232, 82, 190), (235, 128, 0), (50, 239, 1), (20, 20, 20),
-         (255, 255, 0)])
-    new_color = (255, 0, 0)
+    colors = [(3, 169, 244),
+              (192, 23, 0),
+              (50, 50, 255),
+              (232, 82, 190),
+              (235, 128, 0),
+              (50, 239, 1),
+              (20, 20, 20),
+              (255, 255, 0)]
+    new_color = choice(colors)
     pixels.replace(old_color, new_color)
     del pixels
 
@@ -128,6 +133,7 @@ if __name__ == '__main__':
                 f = open("data/best_result.txt", 'w')
                 f.write(result)
                 f.close()
+
         if st_sc:
             start_screen()
             if not play_music:
@@ -151,6 +157,7 @@ if __name__ == '__main__':
                 pygame.mixer.music.load('data/game_start_or_fale.mp3')
                 pygame.mixer.music.play()
                 play_music = True
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
@@ -158,6 +165,7 @@ if __name__ == '__main__':
                     running = False
                 elif event.type == pygame.MOUSEBUTTONDOWN and pygame.Rect(227, 227, 135, 133).collidepoint(event.pos) \
                         or event.type == pygame.KEYDOWN:
+
                     time_start = dt.datetime.now()
                     ov_sc = False
                     pygame.mixer.music.stop()
