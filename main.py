@@ -13,6 +13,9 @@ from bullet import Bullet
 pygame.init()
 width, height = 1000, 720
 screen = pygame.display.set_mode((width, height))
+pygame.display.set_caption("Among Run")
+icon = pygame.image.load("data/icon.png")
+pygame.display.set_icon(icon)
 new_color = None
 st_sc = True
 ov_sc = False
