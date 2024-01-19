@@ -138,7 +138,7 @@ if __name__ == '__main__':
             start_screen()
             if not play_music:
                 pygame.mixer.music.load('data/game_start_or_fale.mp3')
-                pygame.mixer.music.play()
+                pygame.mixer.music.play(loops=-1)
                 play_music = True
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -155,7 +155,7 @@ if __name__ == '__main__':
             over_screen()
             if not play_music:
                 pygame.mixer.music.load('data/game_start_or_fale.mp3')
-                pygame.mixer.music.play()
+                pygame.mixer.music.play(loops=-1)
                 play_music = True
 
             for event in pygame.event.get():
